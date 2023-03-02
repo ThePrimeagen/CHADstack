@@ -6,9 +6,15 @@
 	</head>
 	<body>
 
-		<h2> 
-			{{number1}} + {{number2}} = {{number3}}		
-		</h2>	
+		<div id="trash">
+		</div>
+
+        <script>
+            const n1 = {{number1}};
+            const n2 = {{number2}};
+
+            window.querySelector("#trash").setInnerHTML = `${n1} + ${n2} = ${n1 + n2}`;
+        </script>
 
 	</body>
-</html>		
+</html>
