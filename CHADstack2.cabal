@@ -1,0 +1,20 @@
+cabal-version:      2.4
+name:               CHADstack2
+version:            0.1.0.0
+extra-source-files: CHANGELOG.md
+
+executable haskell-cgi
+  main-is:          Main.hs
+  build-depends:
+    , base
+    , bytestring
+    , directory
+    , filepath
+    , unix
+    , wai
+    , wai-app-file-cgi
+    , warp
+
+  ghc-options:      -Wall
+  hs-source-dirs:   app
+  default-language: Haskell2010

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+/downhill.sh
+/root/.ghcup/bin/cabal run
