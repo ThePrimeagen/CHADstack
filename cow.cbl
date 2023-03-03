@@ -10,7 +10,9 @@
 
        01 newline         pic x   value x'0a'.
 
-       01 analyzed-query pic x(1600).  
+       01 analyzed-query pic x(1600).
+       01 analyzed-script-name pic x(1600).
+       01 tmp-query pic x(1600).
 
        01 the-great-dispatch.
 
@@ -20,8 +22,8 @@
             05   routing-pattern   pic x(999).
             05   routing-destiny   pic x(999).
 
-                                                                               
-       01 tester         pic x(1) value "n".  
+
+       01 tester         pic x(1) value "n".
        01 anyfound       pic x(1) value "n".
        01 ctr            pic 99 usage comp-5.
 
@@ -41,7 +43,20 @@
 
        perform web-header.
 
-       call 'getquery' using analyzed-query.
+       call 'getquery' using analyzed-query analyzed-script-name.
+
+           IF analyzed-script-name IS EQUAL TO "/index.cgi"
+                DISPLAY "I AM INDEX"
+            ELSE
+               DISPLAY "I am not the index" analyzed-query
+                STRING analyzed-script-name DELIMITED BY SPACE
+                          analyzed-query DELIMITED BY SPACE
+                          INTO tmp-query
+               END-STRING
+
+               move tmp-query to analyzed-query
+               DISPLAY "I am not the index " analyzed-query
+            END-IF.
 
 
        perform varying ctr from 1 by 1
@@ -51,7 +66,7 @@
 
            if (tester="y")
 
-              *> display routing-pattern(ctr) "<hr>" 
+              *> display routing-pattern(ctr) "<hr>"
               move "y" to anyfound
               *> display "ctr:" ctr
               call routing-destiny(ctr) using the-values
@@ -64,9 +79,9 @@
 
        if (anyfound="n") perform bad-query-error.
 
-       *> if (anyfound="y")  call 'showvars' using the-values.  
+       *> if (anyfound="y")  call 'showvars' using the-values.
 
-        
+
 
        goback.
 
@@ -160,9 +175,10 @@
 
        linkage section.
 
-       01 the-query pic x(1600).  
+       01 the-query pic x(1600).
+       01 the-script-name pic x(1600).
 
-       procedure division using the-query.
+       procedure division using the-query the-script-name.
 
 
          perform varying name-index from 1 by 1
@@ -171,15 +187,18 @@
                      name-string(name-index)
                  end-accept
 
-                 if (name-string(name-index) = "PATH_INFO")
-                    
-                    move value-string to the-query
 
-                 end-if   
+                 if (name-string(name-index) = "SCRIPT_NAME")
+                    move value-string to the-script-name
+                 end-if
+
+                 if (name-string(name-index) = "PATH_INFO")
+                    move value-string to the-query
+                 end-if
 
          end-perform.
 
-      
+
        goback.
 
        end program getquery.
@@ -228,7 +247,7 @@
 
 
            display "</table>"
-      
+
        goback.
 
        end program showvars.
@@ -247,15 +266,15 @@
 
        01 choppery.
 
-          05 chopped-path-pieces occurs 99 times.                        
-             10 chopped-path-piece pic x(80) value spaces. 
+          05 chopped-path-pieces occurs 99 times.
+             10 chopped-path-piece pic x(80) value spaces.
           05 chopped-pattern-pieces occurs 99 times.
-             10 chopped-pattern-piece pic x(80) value spaces.                           
-                                                                    
-       01 counter       pic s9(04) comp. 
-       01 positio       pic s9(04).                             
-       01 tmp-pointer      pic s9(04) comp value +1. 
-       01 tmp-pointer2      pic s9(04) comp value +1. 
+             10 chopped-pattern-piece pic x(80) value spaces.
+
+       01 counter       pic s9(04) comp.
+       01 positio       pic s9(04).
+       01 tmp-pointer      pic s9(04) comp value +1.
+       01 tmp-pointer2      pic s9(04) comp value +1.
 
 
        01 counter-of-values      pic s9(2).
@@ -269,7 +288,7 @@
 
 
        linkage section.
-       01  the-query pic x(255).
+       01  the-query pic x(512).
        01  the-pattern pic x(255).
        01  result  pic x(1).
 
@@ -283,35 +302,32 @@
 
        procedure division using the-query the-pattern result query-analysis-out.
 
-
           move spaces to choppery.
           move "y" to result.
           move 0 to counter-of-values.
-
 
 
            move 1 to tmp-pointer.
            move 1 to tmp-pointer2.
 
 
-           perform varying counter from 2 by 1 until counter > 99   
+           perform varying counter from 2 by 1 until counter > 99
 
            subtract 1 from counter giving positio
-           
-                unstring the-query delimited by '/'          
-                    into chopped-path-piece(positio)                    
-                   with pointer tmp-pointer    
 
-                unstring the-pattern delimited by '/'          
-                    into chopped-pattern-piece(positio)                    
-                   with pointer tmp-pointer2   
+                unstring the-query delimited by '/'
+                    into chopped-path-piece(positio)
+                   with pointer tmp-pointer
+
+                unstring the-pattern delimited by '/'
+                    into chopped-pattern-piece(positio)
+                   with pointer tmp-pointer2
 
             end-perform.
 
             move 0 to counter.
 
-            *> display "<h3>" the-query " vs " the-pattern "</h3>"
-
+            display "<h3>" the-query " vs " the-pattern "</h3>"
 
             perform varying counter from 1 by 1 until counter > 99 or result = "n"
 
@@ -323,25 +339,25 @@
 
                *> else
 
-               *> display counter "::" result " (" chopped-path-piece(counter) "/" chopped-pattern-piece(counter) ")<P>"
+                *> display counter "::" result " (" chopped-path-piece(counter) "/" chopped-pattern-piece(counter) ")<P>"
 
                  if (chopped-pattern-piece(counter)(1:1) equal "%")
 
                     add 1 to counter-of-values
-                    move chopped-pattern-piece(counter) to query-value-name(counter-of-values) 
-                    move chopped-path-piece(counter) to query-value(counter-of-values) 
+                    move chopped-pattern-piece(counter) to query-value-name(counter-of-values)
+                    move chopped-path-piece(counter) to query-value(counter-of-values)
 
                   *>  display "got val " chopped-pattern-piece(counter) "<P>"
 
-                 end-if    
-              
-                if 
-                  (chopped-path-piece(counter) not equal chopped-pattern-piece(counter) 
-                    and 
-                    chopped-pattern-piece(counter)(1:1) not equal "%") 
+                 end-if
+
+                if
+                  (chopped-path-piece(counter) not equal chopped-pattern-piece(counter)
+                    and
+                    chopped-pattern-piece(counter)(1:1) not equal "%")
                 move "n" to result
                *> display "<P><b>fail at " counter "</b> (" chopped-path-piece(counter) " :: "  chopped-pattern-piece(counter) ")</p>"
-                
+
                 end-if
 
                *> end-if
@@ -349,11 +365,11 @@
 
             end-perform.
 
-                if (result="y") 
+                if (result="y")
                     move query-analysis to query-analysis-out
                 end-if
 
-      
+
        goback.
 
        end program checkquery.
@@ -361,4 +377,4 @@
        end program cow.
 
 
- 
+
