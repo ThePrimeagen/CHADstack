@@ -3,6 +3,7 @@ dist-newstyle/
 warp-3.3.24/
 network-3.1.2.7/
 wai-3.2.3/
+cgi-bin/
 
 
 # Added by cargo
