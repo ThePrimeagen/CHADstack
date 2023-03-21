@@ -5,6 +5,9 @@ RUN apt-get install -qy apache2 libcob1 build-essential curl libffi-dev libffi6 
 RUN apt-get install -qy haskell-platform
 RUN apt-get install -qy vim
 RUN yes | curl --proto '=https' --tlsv1.2 -ksSf https://get-ghcup.haskell.org | sh
+COPY CHADstack2.cabal .
+COPY app ./app
+RUN /root/.ghcup/bin/cabal build
 EXPOSE 80
 ENTRYPOINT ["./run"]
 CMD [ "bash" ]
