@@ -8,6 +8,24 @@ RUN yes | curl --proto '=https' --tlsv1.2 -ksSf https://get-ghcup.haskell.org | 
 COPY CHADstack2.cabal .
 COPY app ./app
 RUN /root/.ghcup/bin/cabal build
+
+## RUST TIME
+# I should really do a multistage build, but then i rememberd i am a true chad
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+RUN /root/.cargo/bin/cargo install cargo-chadr
+
+RUN mkdir /cow/controllers
+RUN mkdir /cow/views
+
+COPY pages /cow/pages
+COPY run run
+COPY downhill.sh downhill.sh
+COPY cow.cbl cow.cbl
+COPY cowtemplate.cbl cowtemplate.cbl
+
+RUN /root/.cargo/bin/cargo chadr
+
 EXPOSE 80
 ENTRYPOINT ["./run"]
 CMD [ "bash" ]
