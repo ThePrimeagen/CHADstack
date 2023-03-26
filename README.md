@@ -1,5 +1,8 @@
 CHADstack
 =======
+>[sic] a framework of technologies mashed together with duct tape and hope. 
+>
+>~ [roastedby.ai](https://www.roastedby.ai)
 
 ### COBOL
 https://github.com/azac/cobol-on-wheelchair/blob/master/tutorial/index.md
