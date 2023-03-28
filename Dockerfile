@@ -13,10 +13,8 @@ RUN /root/.ghcup/bin/cabal build
 # I should really do a multistage build, but then i rememberd i am a true chad
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
+ARG CACHE_BUST=1
 RUN /root/.cargo/bin/cargo install cargo-chadr
-
-RUN mkdir /cow/controllers
-RUN mkdir /cow/views
 
 COPY pages /cow/pages
 COPY run run
@@ -24,7 +22,10 @@ COPY downhill.sh downhill.sh
 COPY cow.cbl cow.cbl
 COPY cowtemplate.cbl cowtemplate.cbl
 
-RUN /root/.cargo/bin/cargo chadr
+RUN /root/.cargo/bin/cargo chadr -- --version
+RUN /root/.cargo/bin/cargo chadr -- chad
+RUN ./downhill.sh
+RUN /root/.cargo/bin/cargo chadr -- link
 
 EXPOSE 80
 ENTRYPOINT ["./run"]
