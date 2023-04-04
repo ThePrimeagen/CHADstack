@@ -327,7 +327,7 @@
 
             move 0 to counter.
 
-            display "<h3>" the-query " vs " the-pattern "</h3>"
+            *> display "<h3>" the-query " vs " the-pattern "</h3>"
 
             perform varying counter from 1 by 1 until counter > 99 or result = "n"
 
