@@ -19,8 +19,6 @@ RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse /root/.cargo/bin/cargo install ca
 COPY pages /cow/pages
 COPY run run
 COPY downhill.sh downhill.sh
-COPY cow.cbl cow.cbl
-COPY cowtemplate.cbl cowtemplate.cbl
 
 RUN /root/.cargo/bin/cargo chadr -- --version
 RUN /root/.cargo/bin/cargo chadr -- chad
