@@ -6,7 +6,6 @@ import Network.Wai
 import Network.Wai.Application.Classic hiding ((</>))
 import Network.Wai.Handler.Warp
 import System.Directory
-import System.FilePath
 
 main :: IO ()
 main = do

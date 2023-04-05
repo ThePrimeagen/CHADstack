@@ -14,7 +14,7 @@ RUN /root/.ghcup/bin/cabal build
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
 ARG CACHE_BUST=1
-RUN /root/.cargo/bin/cargo install cargo-chadr
+RUN CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse /root/.cargo/bin/cargo install cargo-chadr
 
 COPY pages /cow/pages
 COPY run run
