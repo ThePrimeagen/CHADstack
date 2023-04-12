@@ -1,11 +1,16 @@
-FROM ubuntu:bionic AS builder
+FROM ubuntu:focal AS builder
 WORKDIR /cow
-RUN apt-get update && apt-get install -qy open-cobol
-RUN apt-get install -qy apache2 libcob1 build-essential curl libffi-dev libffi6 libgmp-dev libgmp10 libncurses-dev libncurses5 libtinfo5 curl
-RUN apt-get install -qy haskell-platform
-RUN apt-get install -qy vim
+RUN apt update
+RUN apt full-upgrade -qy
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Madrid
+RUN apt install -qy tzdata
+
+RUN apt install -qy apt-utils open-cobol apache2 libcob4 build-essential curl libffi-dev libffi7 libgmp-dev libgmp10 libncurses-dev libncurses5 libtinfo5 curl haskell-platform neovim
 RUN yes | curl --proto '=https' --tlsv1.2 -ksSf https://get-ghcup.haskell.org | sh
 COPY CHADstack2.cabal .
+COPY downhill.sh .
 COPY app ./app
 RUN /root/.ghcup/bin/cabal build
 
@@ -22,7 +27,7 @@ COPY downhill.sh downhill.sh
 
 RUN /root/.cargo/bin/cargo chadr -- --version
 RUN /root/.cargo/bin/cargo chadr -- chad
-RUN ./downhill.sh
+RUN cobc -Wall -x -free cow.cbl cowtemplate.cbl `ls -d controllers/*` -o the.cow
 RUN /root/.cargo/bin/cargo chadr -- link
 
 EXPOSE 80
@@ -30,7 +35,7 @@ ENTRYPOINT ["./run"]
 CMD [ "bash" ]
 
 # FROM haskell:buster
-# RUN apt-get update && apt-get install -qy curl apache2 libcob4 haskell-platform
+# RUN apt update && apt install -qy curl apache2 libcob4 haskell-platform
 # COPY --from=builder /cow /cow
 # RUN curl -o Cabal.tar.gz https://downloads.haskell.org/~cabal/Cabal-3.8.1.0/Cabal-3.8.1.0.tar.gz
 # RUN mkdir /cabal
